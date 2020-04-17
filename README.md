@@ -1,3 +1,1 @@
-This repository comprises of SQL Projects \n
-Contains:
-  Airport System
+This repository comprises of SQL Projects
