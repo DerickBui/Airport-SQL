@@ -50,6 +50,13 @@ CREATE TABLE chargedFlight (
 	CONSTRAINT chargedflight_fk FOREIGN KEY (SID) REFERENCES schedule(SID)
 );
 
+CREATE TABLE amenity (
+	CFID int NOT NULL,
+	type varchar(50) NOT NULL,
+	cost varchar(50) NOT NULL,
+	CONSTRAINT amenity_pk PRIMARY KEY (CFID, type, cost)
+);
+
 CREATE TABLE domesticFlight (
 	CFID int NOT NULL,
 	domesticTaxCR varchar(50) NOT NULL,
@@ -66,46 +73,46 @@ CREATE TABLE localFlight (
 
 CREATE TABLE crew (
 	CID int NOT NULL,
-	CONSTRAINT crew_pk PRIMARY KEY (CID)
+	crewName varchar(50) NOT NULL,
+	CONSTRAINT crew_pk PRIMARY KEY (CID),
+	CONSTRAINT crew_uk UNIQUE (CID, crewName)
 );
 
 CREATE TABLE crewMember (
-	CMID int NOT NULL,
 	CID int,
 	fName varchar(50) NOT NULL,
 	lName varchar(50) NOT NULL,
 	FAANum varchar(50) NOT NULL,
-	CONSTRAINT crewmember_pk PRIMARY KEY (CMID),
-	CONSTRAINT crewmember_fk FOREIGN KEY (CID) REFERENCES crew(CID),
-	CONSTRAINT crewmember_uk UNIQUE (CID, FAANum)
+	CONSTRAINT crewmember_pk PRIMARY KEY (FAANum),
+	CONSTRAINT crewmember_fk FOREIGN KEY (CID) REFERENCES crew(CID)
 );
 
 CREATE TABLE pilot (
-	CMID int NOT NULL,
+	FAANum varchar(50) NOT NULL,
 	pLicense varchar(50) NOT NULL,
-	CONSTRAINT pilot_pk PRIMARY KEY (CMID),
-	CONSTRAINT pilot_fk FOREIGN KEY (CMID) REFERENCES crewMember(CMID)
+	CONSTRAINT pilot_pk PRIMARY KEY (FAANum),
+	CONSTRAINT pilot_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
 );
 
 CREATE TABLE copilot (
-	CMID int NOT NULL,
+	FAANum varchar(50) NOT NULL,
 	cpLicense varchar(50) NOT NULL,
-	CONSTRAINT copilot_pk PRIMARY KEY (CMID),
-	CONSTRAINT copilot_fk FOREIGN KEY (CMID) REFERENCES crewMember(CMID)
+	CONSTRAINT copilot_pk PRIMARY KEY (FAANum),
+	CONSTRAINT copilot_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
 );
 
 CREATE TABLE navigator (
-	CMID int NOT NULL,
+	FAANum varchar(50) NOT NULL,
 	nLicense varchar(50) NOT NULL,
-	CONSTRAINT navigator_pk PRIMARY KEY (CMID),
-	CONSTRAINT navigator_fk FOREIGN KEY (CMID) REFERENCES crewMember(CMID)
+	CONSTRAINT navigator_pk PRIMARY KEY (FAANum),
+	CONSTRAINT navigator_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
 );
 
 CREATE TABLE attendant (
-	CMID int NOT NULL,
+	FAANum varchar(50) NOT NULL,
 	aCertNum int NOT NULL,
-	CONSTRAINT attendant_pk PRIMARY KEY (CMID),
-	CONSTRAINT attendant_fk FOREIGN KEY (CMID) REFERENCES crewMember(CMID)
+	CONSTRAINT attendant_pk PRIMARY KEY (FAANum),
+	CONSTRAINT attendant_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
 );
 
 drop table attendant
@@ -116,6 +123,7 @@ drop table crewmember
 drop table crew
 drop table localFlight
 drop table domesticFlight
+drop table amenity
 drop table chargedFlight
 drop table internationalFlight
 drop table schedule
