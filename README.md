@@ -1,1 +1,4 @@
-This repository comprises of SQL Projects
+This repository comprises of:
+  - SQL Projects
+  - UML Diagrams
+  - Relation Schemes
