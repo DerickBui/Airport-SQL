@@ -10,8 +10,10 @@ CREATE TABLE plane (
 	NumOfSeats int NOT NULL,
 	PlaneName varchar(50),
 	ModelNum varchar(50) NOT NULL,
+	YearsOfServ int NOT NULL,
 	CONSTRAINT plane_pk PRIMARY KEY (airlineName, FAATailNum, NumOfSeats),
-	CONSTRAINT plane_fk FOREIGN KEY (airlineName) REFERENCES airline(airlineName)
+	CONSTRAINT plane_fk FOREIGN KEY (airlineName) REFERENCES airline(airlineName),
+	CONSTRAINT plane_chk CHECK (YearsOfServ >= 30)
 );
 
 CREATE TABLE airport (
@@ -44,31 +46,30 @@ CREATE TABLE internationalFlight (
 
 CREATE TABLE chargedFlight (
 	SID int NOT NULL,
-	CFID int NOT NULL,
 	CONSTRAINT chargedflight_pk PRIMARY KEY (CFID),
         CONSTRAINT chargedflight_uk UNIQUE (SID, CFID),
 	CONSTRAINT chargedflight_fk FOREIGN KEY (SID) REFERENCES schedule(SID)
 );
 
 CREATE TABLE amenity (
-	CFID int NOT NULL,
+	SID int NOT NULL,
 	type varchar(50) NOT NULL,
 	cost varchar(50) NOT NULL,
-	CONSTRAINT amenity_pk PRIMARY KEY (CFID, type, cost)
+	CONSTRAINT amenity_pk PRIMARY KEY (SID, type, cost)
 );
 
 CREATE TABLE domesticFlight (
-	CFID int NOT NULL,
+	SID int NOT NULL,
 	domesticTaxCR varchar(50) NOT NULL,
-	CONSTRAINT domesticflight_pk PRIMARY KEY (CFID),
-	CONSTRAINT domesticflight_fk FOREIGN KEY (CFID) REFERENCES chargedFlight(CFID)
+	CONSTRAINT domesticflight_pk PRIMARY KEY (SID),
+	CONSTRAINT domesticflight_fk FOREIGN KEY (SID) REFERENCES chargedFlight(SID)
 );
 
 CREATE TABLE localFlight (
-	CFID int NOT NULL,
+	SID int NOT NULL,
 	localTaxCR varchar(50) NOT NULL,
-	CONSTRAINT localflight_pk PRIMARY KEY (CFID),
-	CONSTRAINT localflight_fk FOREIGN KEY (CFID) REFERENCES chargedFlight(CFID)
+	CONSTRAINT localflight_pk PRIMARY KEY (SID),
+	CONSTRAINT localflight_fk FOREIGN KEY (SID) REFERENCES chargedFlight(SID)
 );
 
 CREATE TABLE crew (
@@ -115,6 +116,81 @@ CREATE TABLE attendant (
 	CONSTRAINT attendant_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
 );
 
+CREATE TABLE flight (
+	FID int NOT NULL,
+	CID int NOT NULL,
+	SID int NOT NULL,
+	airlineName varchar(50) NOT NULL,
+	FAATailNum varchar(50) NOT NULL,
+	NumOfSeats int NOT NULL,
+	date varchar(50) NOT NULL,
+	numOfPassengers int NOT NULL,
+	aDepTime varchar(50) NOT NULL,
+	aActTime varchar(50) NOT NULL,
+	CONSTRAINT flight_pk PRIMARY KEY (FID),
+	CONSTRAINT flight_fk1 FOREIGN KEY (CID) REFERENCES crew(CID),
+	CONSTRAINT flight_fk2 FOREIGN KEY (SID) REFERENCES schedule(SID),
+	CONSTRAINT flight_fk3 FOREIGN KEY (airlineName, FAATailNum, NumOfSeats) REFERENCES plane(airlineName, FAATailNum, NumOfSeats),
+	CONSTRAINT flight_uk UNIQUE (CID, SID, airlineName, FAATailNum, NumOfSeats),
+	CONSTRAINT flight_chk CHECK (NumOfSeats >= numOfPassengers)
+);
+
+CREATE TABLE incidentReport (
+	FID int NOT NULL,
+	CMReporting varchar(50) NOT NULL,
+	CMInvolved varchar(50) NOT NULL,
+	TypeOfIncident varchar(50) NOT NULL,
+	Description varchar(50) NOT NULL,
+	CONSTRAINT incidentreport_pk PRIMARY KEY (FID, CMReporting, CMInvolved),
+	CONSTRAINT incidentreport_fk1 FOREIGN KEY (FID) REFERENCES flight(FID),
+	CONSTRAINT incidentreport_fk2 FOREIGN KEY (CMReporting) REFERENCES crewMember(FAANum),
+	CONSTRAINT incidentreport_fk3 FOREIGN KEY (CMInvolved) REFERENCES crewMember(FAANum)
+);
+
+INSERT INTO airline (airlineName, HQLocation)
+VALUES ('JetBlue', 'Long Island City, New York'),
+('Delta Air Lines', 'Atlanta, George, US'),
+(Hawaiian Airlines, 'Honolulu, Hawaii, US'),
+('Lufthansa', 'Cologne, North Rhine-Westphalia, Germany'),
+('Air France', 'Tremblay-en-France, Ile-de-France, France');
+
+INSERT INTO plane (airlineName, FAATailNum, NumOfSeats, PlaneName, ModelNum, YearsOfServ)
+VALUES ('JetBlue', 'A#100', 400, 'Whale', 'B747', 18),
+('JetBlue', 'A#101', 400, 'Beluga', 'B747', 12),
+('JetBlue', 'A#102', 400, 'Flounder', 'B747', 1),
+('JetBlue', 'A#103', 400, 'Clown', 'B747', 23),
+('JetBlue', 'A#104', 400, 'Starfish', 'B747', 21),
+('Delta Air Lines', 'A#105', 400, 'Essex', 'B747', 15),
+('Delta Air Lines', 'A#106', 400, 'Crunder', 'B747', 18),
+('Delta Air Lines', 'A#107', 400, 'Maxil', 'B747', 12),
+('Delta Air Lines', 'A#108', 400, 'Bass', 'B747', 9),
+('Delta Air Lines', 'A#109', 400, 'Scraper', 'B747', 8),
+('Hawaiian Airlines', 'A#110', 400, 'Ohana', 'B747', 3),
+('Hawaiian Airlines', 'A#111', 400, 'Beach', 'B747', 6),
+('Hawaiian Airlines', 'A#112', 400, 'Waves', 'B747', 10),
+('Hawaiian Airlines', 'A#113', 400, 'Kamehameha', 'B747', 11),
+('Hawaiian Airlines', 'A#114', 400, 'Pele', 'B747', 26),
+('Air France', 'A#115', 350, 'Rouge', 'A350', 29),
+('Air France', 'A#116', 350, 'Le Garcon', 'A350', 11),
+('Air France', 'A#117', 350, 'La Fille', 'A350', 9),
+('Air France', 'A#118', 350, 'Teres', 'A350', 5),
+('Air France', 'A#119', 350, 'Avion', 'A350', 17),
+('Lufthansa', 'A#120', 350, 'Schwarz', 'A350', 8),
+('Lufthansa', 'A#121', 350, 'Weiss', 'A350', 3),
+('Lufthansa', 'A#122', 350, 'Bayern', 'A350', 6),
+('Lufthansa', 'A#123', 350, 'Schadenfreud', 'A350', 1),
+('Lufthansa', 'A#124', 350, 'Einz', 'A350', 24);
+
+INSERT INTO airport (airportName, location, FAAAbriev)
+VALUES ('John F. Kennedy International Airport', 'Queens, NY 11430' , 'JFK'),
+('Los Angeles International Airport', '1 World Way, Los Angeles, CA 90045' , 'LAX'),
+('Seattle-Tacoma International Airport', '17801 International Blvd, Seattle, WA 98158' , 'SEA'),
+('Daniel K. Inouye International Airport', '300 Rodgers Blvd, Honolulu, HI 96819' , 'HNL'),
+('Paris Charles de Gaulle Airport', '95700 Roissy-en-France, France', 'CDG'),
+('Frankfurt am Main Airport', '60547 Frankfurt, Germany', 'FRA');
+
+drop table incidentReport
+drop table flight
 drop table attendant
 drop table navigator
 drop table copilot
@@ -127,6 +203,6 @@ drop table amenity
 drop table chargedFlight
 drop table internationalFlight
 drop table schedule
-drop table airport
-drop table plane
-drop table airline
+drop table airport --
+drop table plane --
+drop table airline --
