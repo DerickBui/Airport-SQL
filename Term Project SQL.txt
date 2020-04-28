@@ -28,8 +28,8 @@ CREATE TABLE schedule (
 	FlightNum int NOT NULL,
 	departingAirport varchar(50) NOT NULL,
 	arrivingAirport varchar(50) NOT NULL,
-	departureTime varchar(50) NOT NULL,
-	arrivalTime varchar(50) NOT NULL,
+	departureTime time NOT NULL,
+	arrivalTime time NOT NULL,
 	CONSTRAINT schedule_pk PRIMARY KEY (SID),
 	CONSTRAINT schedule_fk1 FOREIGN KEY (departingAirport) REFERENCES airport(airportName),
 	CONSTRAINT schedule_fk2 FOREIGN KEY (arrivingAirport) REFERENCES airport(airportName),
@@ -122,15 +122,15 @@ CREATE TABLE flight (
 	airlineName varchar(50) NOT NULL,
 	FAATailNum varchar(50) NOT NULL,
 	NumOfSeats int NOT NULL,
-	date varchar(50) NOT NULL,
+	dates varchar(50) NOT NULL,
 	numOfPassengers int NOT NULL,
-	aDepTime varchar(50) NOT NULL,
-	aActTime varchar(50) NOT NULL,
+	aDepTime time NOT NULL,
+	aArrTime time NOT NULL,
 	CONSTRAINT flight_pk PRIMARY KEY (FID),
 	CONSTRAINT flight_fk1 FOREIGN KEY (CID) REFERENCES crew(CID),
 	CONSTRAINT flight_fk2 FOREIGN KEY (SID) REFERENCES schedule(SID),
 	CONSTRAINT flight_fk3 FOREIGN KEY (airlineName, FAATailNum, NumOfSeats) REFERENCES plane(airlineName, FAATailNum, NumOfSeats),
-	CONSTRAINT flight_uk UNIQUE (CID, SID, airlineName, FAATailNum, NumOfSeats),
+	CONSTRAINT flight_uk UNIQUE (CID, SID, airlineName, FAATailNum, NumOfSeats, dates),
 	CONSTRAINT flight_chk CHECK (NumOfSeats >= numOfPassengers)
 );
 
@@ -148,7 +148,7 @@ CREATE TABLE incidentReport (
 
 INSERT INTO airline (airlineName, HQLocation)
 VALUES ('JetBlue', 'Long Island City, New York'),
-('Delta Air Lines', 'Atlanta, George, US'),
+('Delta Air Lines', 'Atlanta, Georgia, US'),
 ('Hawaiian Airlines', 'Honolulu, Hawaii, US'),
 ('Lufthansa', 'Cologne, North Rhine-Westphalia, Germany'),
 ('Air France', 'Tremblay-en-France, Ile-de-France, France');
@@ -175,16 +175,16 @@ VALUES ('John F. Kennedy International Airport', 'Queens, NY 11430' , 'JFK'),
 ('Frankfurt am Main Airport', '60547 Frankfurt, Germany', 'FRA');
 
 INSERT INTO schedule (SID, FlightNum, departingAirport, arrivingAirport, departureTime, arrivalTime)
-VALUES (1, 1, 'John F. Kennedy International Airport', 'Los Angeles International Airport', '11:30AM', '5:00PM'),
-(2, 23, 'Seattle-Tacoma International Airport', 'John F. Kennedy International Airport', '8:30AM', '9:00PM'),
-(3, 1, 'John F. Kennedy International Airport', 'Seattle-Tacoma International Airport', '11:30AM', '5:00PM'),
-(4, 36, 'Los Angeles International Airport', 'Seattle-Tacoma International Airport', '7:30AM', '11:00AM'),
-(5, 41, 'Daniel K. Inouye International Airport', 'Seattle-Tacoma International Airport', '9:30AM', '5:00PM'),
-(6, 53, 'Los Angeles International Airport', 'Daniel K. Inouye International Airport', '12:30PM', '7:00PM'),
-(7, 17, 'Los Angeles International Airport', 'Ontario International Airport', '12:30PM', '1:00PM'),
-(8, 5, 'John F. Kennedy International Airport', 'Paris Charles de Gaulle Airport', '11:30AM', '8:00PM'),
-(9, 97, 'Frankfurt am Main Airport', 'John F. Kennedy International Airport', '10:00AM', '5:00PM'),
-(10, 4, 'Paris Charles de Gaulle Airport', 'Frankfurt am Main Airport', '11:30AM', '12:30PM');
+VALUES (1, 1, 'John F. Kennedy International Airport', 'Los Angeles International Airport', '11:30', '17:00'),
+(2, 23, 'Seattle-Tacoma International Airport', 'John F. Kennedy International Airport', '8:30', '21:00'),
+(3, 1, 'John F. Kennedy International Airport', 'Seattle-Tacoma International Airport', '11:30', '17:00'),
+(4, 36, 'Los Angeles International Airport', 'Seattle-Tacoma International Airport', '7:30', '11:00'),
+(5, 41, 'Daniel K. Inouye International Airport', 'Seattle-Tacoma International Airport', '9:30', '17:00'),
+(6, 53, 'Los Angeles International Airport', 'Daniel K. Inouye International Airport', '12:30', '19:00'),
+(7, 17, 'Los Angeles International Airport', 'Ontario International Airport', '12:30', '13:00'),
+(8, 5, 'John F. Kennedy International Airport', 'Paris Charles de Gaulle Airport', '11:30', '20:00'),
+(9, 97, 'Frankfurt am Main Airport', 'John F. Kennedy International Airport', '10:00', '17:00'),
+(10, 4, 'Paris Charles de Gaulle Airport', 'Frankfurt am Main Airport', '11:30', '12:30');
 
 INSERT INTO internationalFlight (SID, InternationalTaxCR)
 VALUES (8, '5%'),
@@ -355,22 +355,61 @@ VALUES('FN150', 109),
 ('FN173', 333),
 ('FN174', 342);
 
-INSERT INTO flight (FID, CID, SID, airlineName, FAATailNum, NumOfSeats, date, numOfPassengers, aDepTime, aActTime)
-VALUES (1, 1, 1, 'JetBlue', 'A#100', 400, '4-20-20', 387, '11:35AM', '4:59PM'),
-(2, 2, 2, 'JetBlue', 'A#101', 400, '3-30-20', 384, '8:35AM', '9:12PM'),
-(3, 3, 3, 'Delta Air Lines', 'A#105', 400, '2-28-20', 392, '11:47AM', '5:24PM'),
-(4, 4, 4, 'Delta Air Lines', 'A#106', 400, '4-16-20', 400, '7:35AM', '11:12AM'),
-(5, 5, 5, 'Hawaiian Airlines', 'A#110', 400, '4-18-20', 400, '9:31AM', '4:49PM'),
-(6, 6, 6, 'Hawaiian Airlines', 'A#111', 400, '4-12-20', 378, '12:38PM', '7:21PM'),
-(7, 7, 7, 'Delta Air Lines', 'A#115', 400, '4-13-20', 398, '12:51PM', '1:46PM'),
-(8, 8, 8, 'Air France', 'A#116', 350, '4-28-20', 345, '11:31AM', '7:40PM'),
-(9, 9, 9, 'Lufthansa', 'A#121', 350, '3-09-20', 346, '10:12AM', '5:01PM'),
-(10, 10, 10, 'Lufthansa', 'A#124', 350, '3-23-20', 340, '11:34AM', '12:34PM');
+INSERT INTO flight (FID, CID, SID, airlineName, FAATailNum, NumOfSeats, dates, numOfPassengers, aDepTime, aArrTime)
+VALUES (12, 10, 9, 'Lufthansa', 'A#124', 350, '05-23-20', 340, '10:12', '17:01'),
+(11, 2, 1, 'JetBlue', 'A#100', 400, '04-20-20', 335, '8:35', '21:12'),
+(1, 1, 1, 'JetBlue', 'A#100', 400, '04-20-20', 387, '11:35', '16:59'),
+(2, 2, 2, 'JetBlue', 'A#101', 400, '03-30-20', 384, '8:35', '21:12'),
+(3, 3, 3, 'Delta Air Lines', 'A#105', 400, '02-28-20', 392, '11:47', '17:24'),
+(4, 4, 4, 'Delta Air Lines', 'A#106', 400, '06-16-20', 400, '7:35', '11:12'),
+(5, 5, 5, 'Hawaiian Airlines', 'A#110', 400, '04-18-20', 400, '9:31', '16:49'),
+(6, 6, 6, 'Hawaiian Airlines', 'A#111', 400, '05-12-20', 378, '12:38', '19:21'),
+(7, 7, 7, 'Delta Air Lines', 'A#115', 400, '04-13-20', 398, '12:51', '13:46'),
+(8, 8, 8, 'Air France', 'A#116', 350, '04-28-20', 345, '11:31', '19:40'),
+(9, 9, 9, 'Lufthansa', 'A#121', 350, '05-09-20', 346, '10:12', '17:01'),
+(10, 10, 10, 'Lufthansa', 'A#124', 350, '05-23-20', 340, '11:34', '12:34');
 
 INSERT INTO incidentReport(FID, CMReporting, CMInvolved, TypeOfIncident, Description)
 VALUES (10, 'FN173', 'FN174', 'Accident', 'Attendant spilled food tray over passenger.'),
 (1, 'FN120', 'FN130', 'Medical', 'Co-pilot is having a short of breath.'),
 (8, 'FN170', 'FN169', 'Medical', 'Attendant performed CPR on a passenger.');
+
+SELECT * FROM airline;
+
+SELECT s.departingAirport, f.airlineName FROM schedule s INNER JOIN flight f
+ON s.SID = f.SID
+WHERE f.airlineName = 'JetBlue'
+ORDER BY s.departingAirport;
+
+SELECT s.arrivingAirport, f.airlineName FROM schedule s INNER JOIN flight f
+ON s.SID = f.SID
+WHERE f.airlineName = 'JetBlue'
+ORDER BY s.arrivingAirport;
+
+SELECT s.arrivingAirport, f.airlineName FROM schedule s INNER JOIN flight f
+ON s.SID = f.SID
+ORDER BY f.ADEPTIME;
+
+SELECT s.FLIGHTNUM, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, s.DEPARTURETIME, s.ARRIVALTIME, a."TYPE", a.COST
+FROM schedule s 
+INNER JOIN chargedFlight chg ON s.SID = chg.SID
+INNER JOIN amenity a ON chg.SID = a.SID;
+
+SELECT fl.AIRLINENAME, c.CREWNAME, cm.FNAME, cm.LNAME, cm.FAANUM FROM flight fl
+INNER JOIN crew c ON fl.CID = c.CID
+INNER JOIN crewmember cm ON c.CID = cm.CID
+ORDER BY fl.FAATAILNUM, c.CREWNAME, cm.FNAME ASC;
+
+SELECT s.DEPARTINGAIRPORT, COUNT(s.DEPARTINGAIRPORT) FROM schedule s
+GROUP BY s.DEPARTINGAIRPORT;
+
+SELECT s.ARRIVINGAIRPORT, COUNT(s.ARRIVINGAIRPORT) FROM schedule s
+GROUP BY s.ARRIVINGAIRPORT;
+
+SELECT c.CREWNAME FROM crew c
+INNER JOIN flight f ON c.CID = f.CID
+GROUP BY c.CREWNAME
+HAVING COUNT(f.dates) > 1;
 
 drop table incidentReport --
 drop table flight --
