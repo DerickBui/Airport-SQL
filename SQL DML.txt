@@ -1,0 +1,229 @@
+INSERT INTO airline (airlineName, HQLocation)
+VALUES ('JetBlue', 'Long Island City, New York'),
+('Delta Air Lines', 'Atlanta, Georgia, US'),
+('Hawaiian Airlines', 'Honolulu, Hawaii, US'),
+('Lufthansa', 'Cologne, North Rhine-Westphalia, Germany'),
+('Air France', 'Tremblay-en-France, Ile-de-France, France');
+
+INSERT INTO plane (airlineName, FAATailNum, NumOfSeats, PlaneName, ModelNum, YearsOfServ)
+VALUES ('JetBlue', 'A#100', 400, 'Whale', 'B747', 18),
+('JetBlue', 'A#101', 400, 'Beluga', 'B747', 12),
+('Delta Air Lines', 'A#105', 400, 'Essex', 'B747', 15),
+('Delta Air Lines', 'A#106', 400, 'Crunder', 'B747', 18),
+('Hawaiian Airlines', 'A#110', 400, 'Ohana', 'B747', 3),
+('Hawaiian Airlines', 'A#111', 400, 'Beach', 'B747', 6),
+('Delta Air Lines', 'A#115', 400, 'Red', 'A350', 29),
+('Air France', 'A#116', 350, 'Le Garcon', 'A350', 11),
+('Lufthansa', 'A#121', 350, 'Weiss', 'A350', 3),
+('Lufthansa', 'A#124', 350, 'Einz', 'A350', 24);
+
+INSERT INTO airport (airportName, location, FAAAbriev)
+VALUES ('John F. Kennedy International Airport', 'Queens, NY 11430' , 'JFK'),
+('Los Angeles International Airport', '1 World Way, Los Angeles, CA 90045' , 'LAX'),
+('Ontario International Airport', 'Ontario, CA 91761' , 'ONT'),
+('Seattle-Tacoma International Airport', '17801 International Blvd, Seattle, WA 98158' , 'SEA'),
+('Daniel K. Inouye International Airport', '300 Rodgers Blvd, Honolulu, HI 96819' , 'HNL'),
+('Paris Charles de Gaulle Airport', '95700 Roissy-en-France, France', 'CDG'),
+('Frankfurt am Main Airport', '60547 Frankfurt, Germany', 'FRA');
+
+INSERT INTO schedule (SID, FlightNum, departingAirport, arrivingAirport, departureTime, arrivalTime)
+VALUES (1, 1, 'John F. Kennedy International Airport', 'Los Angeles International Airport', '11:30', '17:00'),
+(2, 23, 'Seattle-Tacoma International Airport', 'John F. Kennedy International Airport', '8:30', '21:00'),
+(3, 1, 'John F. Kennedy International Airport', 'Seattle-Tacoma International Airport', '11:30', '17:00'),
+(4, 36, 'Los Angeles International Airport', 'Seattle-Tacoma International Airport', '7:30', '11:00'),
+(5, 41, 'Daniel K. Inouye International Airport', 'Seattle-Tacoma International Airport', '9:30', '17:00'),
+(6, 53, 'Los Angeles International Airport', 'Daniel K. Inouye International Airport', '12:30', '19:00'),
+(7, 17, 'Los Angeles International Airport', 'Ontario International Airport', '12:30', '13:00'),
+(8, 5, 'John F. Kennedy International Airport', 'Paris Charles de Gaulle Airport', '11:30', '20:00'),
+(9, 97, 'Frankfurt am Main Airport', 'John F. Kennedy International Airport', '10:00', '17:00'),
+(10, 4, 'Paris Charles de Gaulle Airport', 'Frankfurt am Main Airport', '11:30', '12:30');
+
+INSERT INTO internationalFlight (SID, InternationalTaxCR)
+VALUES (8, '5%'),
+(9, '3%'),
+(10, '1%');
+
+INSERT INTO chargedFlight (SID)
+VALUES (1),
+(2),
+(3),
+(4),
+(5),
+(6),
+(7);
+
+INSERT INTO amenity (SID, Type, cost)
+VALUES (1, 'Baggage', 13),
+(1, 'Food and Drinks', 15),
+(2, 'Baggage', 13),
+(2, 'Food and Drinks', 15),
+(3, 'Baggage', 10),
+(3, 'Food and Drinks', 25),
+(4, 'Baggage', 7),
+(4, 'Food and Drinks', 10),
+(5, 'Baggage', 3),
+(5, 'Food and Drinks', 5);
+
+INSERT INTO domesticFlight (SID, domesticTaxCR)
+VALUES (1, '0.34%'),
+(2, '0.50%'),
+(3, '0.24%'),
+(4, '0.46%'),
+(5, '0.12%'),
+(6, '0.95%');
+
+INSERT INTO  localFlight (SID, localTaxCR)
+VALUES (7, '0.034%');
+
+INSERT INTO crew (CID, crewName)
+VALUES (1, 'Ajax'),
+(2, 'Overture'),
+(3, 'Birdsong'),
+(4, 'Crunchy'),
+(5, 'Clowns'),
+(6, 'Lucky'),
+(7, 'Whoosh'),
+(8, 'LAvion'),
+(9, 'Bute'),
+(10, 'Kesser');
+
+INSERT INTO crewMember (CID, fName, lName, FAANum)
+VALUES (1, 'David', 'Avecker', 'FN120'), --pilots
+(2, 'Joe', 'Schmoe', 'FN121'),
+(3, 'Garret', 'Brockle', 'FN122'),
+(4, 'Bill', 'Jones', 'FN123'),
+(5, 'Evan', 'Sing', 'FN124'),
+(6, 'Terry', 'Harper', 'FN125'),
+(7, 'Ben', 'Ergan', 'FN126'),
+(8, 'Yves', 'Camille-Chamboue', 'FN127'),
+(9, 'Hans', 'Ericson', 'FN128'),
+(10, 'Michael', 'Steinberger', 'FN129'),
+(1, 'Victor', 'Sageril', 'FN130'), --copilots
+(2, 'Silas', 'Everton', 'FN131'),
+(3, 'Xavier', 'Gonzales', 'FN132'),
+(4, 'Eric', 'Jones', 'FN133'),
+(5, 'Daren', 'Johnson', 'FN134'),
+(6, 'Barry', 'Eigen', 'FN135'),
+(7, 'Anthony', 'Ergo', 'FN136'),
+(8, 'Francois', 'Pepois', 'FN137'),
+(9, 'Eric', 'Adams', 'FN138'),
+(10, 'Kevin', 'Teger', 'FN139'),
+(1, 'Anna', 'Bustos', 'FN140'), --navigator
+(2, 'Stephanie', 'Orland', 'FN141'),
+(3, 'Javier', 'Ceras', 'FN142'),
+(4, 'George', 'McCantor', 'FN143'),
+(5, 'Richard', 'Everton', 'FN144'),
+(6, 'Max', 'Bustos', 'FN145'),
+(7, 'Harris', 'Chang', 'FN146'),
+(8, 'Duy', 'Nguyen', 'FN147'),
+(9, 'Lindsay', 'Norton', 'FN148'),
+(10, 'Otto', 'Viscar', 'FN149'),
+(1, 'Amanda', 'Jones', 'FN150'), --attendants crew 1
+(1, 'Rick', 'Keller', 'FN151'),
+(1, 'Oscar', 'Hilton', 'FN152'),
+(2, 'Rasil', 'Navraput', 'FN153'), -- crew2
+(2, 'Kayla', 'Salvini', 'FN154'),
+(2, 'Hadaj', 'Jones', 'FN155'),
+(3, 'Urianger', 'Fores', 'FN156'), -- crew3
+(3, 'Robert', 'Flemming', 'FN157'),
+(3, 'Brenden', 'Lee', 'FN158'),
+(4, 'Alejandro', 'Montoya', 'FN159'), -- crew4
+(4, 'Nix', 'Alberta', 'FN160'),
+(4, 'Nicole', 'Flemming', 'FN161'),
+(5, 'Mila', 'Bridges', 'FN162'), --crew5
+(5, 'Karen', 'Why', 'FN163'),
+(6, 'Alex', 'Halif', 'FN164'), --crew6
+(6, 'Lauren', 'Peralta', 'FN165'), 
+(6, 'Elaine', 'Ho', 'FN166'),
+(7, 'Kellie', 'Yamamoto', 'FN167'), --crew7
+(7, 'Kyla', 'Ericson', 'FN168'), 
+(8, 'Angela', 'Gerodson', 'FN169'), --crew8
+(8, 'Michelle', 'Ordson', 'FN170'), 
+(9, 'Kali', 'Asi', 'FN171'), --crew9
+(9, 'Thomas', 'Canter', 'FN172'), 
+(10, 'Adam', 'Jackson', 'FN173'), --crew10
+(10, 'Jack', 'Unger', 'FN174');
+
+INSERT INTO pilot (FAANum, pLicense)
+VALUES('FN120', 'WE123'),
+('FN121', 'AV227'),
+('FN122', 'UT316'),
+('FN123', 'JL643'),
+('FN124', 'BN808'),
+('FN125', 'PS010'),
+('FN126', 'KL907'),
+('FN127', 'GH462'),
+('FN128', 'YU845'),
+('FN129', 'RT576');
+
+INSERT INTO copilot (FAANum, cpLicense)
+VALUES('FN130', 'aIH793'),
+('FN131', 'aDJ464'),
+('FN132', 'aEC285'),
+('FN133', 'aSC423'),
+('FN134', 'aFS757'),
+('FN135', 'aDE468'),
+('FN136', 'aEX100'),
+('FN137', 'aJB397'),
+('FN138', 'aYF695'),
+('FN139', 'aGH354');
+
+INSERT INTO navigator (FAANum, nLicense)
+VALUES('FN140', 'N10'),
+('FN141', 'N11'),
+('FN142', 'N12'),
+('FN143', 'N13'),
+('FN144', 'N14'),
+('FN145', 'N15'),
+('FN146', 'N16'),
+('FN147', 'N17'),
+('FN148', 'N18'),
+('FN149', 'N19');
+
+INSERT INTO attendant (FAANum, aCertNum)
+VALUES('FN150', 109),
+('FN151', 111),
+('FN152', 126),
+('FN153', 136),
+('FN154', 144),
+('FN155', 151),
+('FN156', 165),
+('FN157', 174),
+('FN158', 183),
+('FN159', 198),
+('FN160', 204),
+('FN161', 211),
+('FN162', 225),
+('FN163', 236),
+('FN164', 243),
+('FN165', 259),
+('FN166', 267),
+('FN167', 273),
+('FN168', 284),
+('FN169', 293),
+('FN170', 304),
+('FN171', 318),
+('FN172', 325),
+('FN173', 333),
+('FN174', 342);
+
+INSERT INTO flight (FID, CID, SID, airlineName, FAATailNum, NumOfSeats, dates, numOfPassengers, aDepTime, aArrTime)
+VALUES (14, 1, 1, 'JetBlue', 'A#100', 400, '05/06/2020', 387, '11:45', '17:15'),
+(13, 3, 3, 'Delta Air Lines', 'A#105', 400, '05/07/2020', 392, '11:50', '17:34'),
+(12, 10, 9, 'Lufthansa', 'A#124', 350, '05/23/2020', 340, '10:12', '17:01'),
+(11, 2, 1, 'JetBlue', 'A#100', 400, '04/20/2020', 335, '8:35', '21:12'),
+(1, 1, 1, 'JetBlue', 'A#100', 400, '04/20/2020', 387, '11:35', '16:59'),
+(2, 2, 2, 'JetBlue', 'A#101', 400, '03/30/2020', 384, '8:35', '21:12'),
+(3, 3, 3, 'Delta Air Lines', 'A#105', 400, '02/28/2020', 392, '11:47', '17:24'),
+(4, 4, 4, 'Delta Air Lines', 'A#106', 400, '06/16/2020', 400, '7:35', '11:12'),
+(5, 5, 5, 'Hawaiian Airlines', 'A#110', 400, '04/18/2020', 400, '9:31', '16:49'),
+(6, 6, 6, 'Hawaiian Airlines', 'A#111', 400, '05/12/2020', 378, '12:38', '19:21'),
+(7, 7, 7, 'Delta Air Lines', 'A#115', 400, '04/13/2020', 398, '12:51', '13:46'),
+(8, 8, 8, 'Air France', 'A#116', 350, '04/28/2020', 345, '11:31', '19:40'),
+(9, 9, 9, 'Lufthansa', 'A#121', 350, '05/09/2020', 346, '10:12', '17:01'),
+(10, 10, 10, 'Lufthansa', 'A#124', 350, '05/23/2020', 340, '11:34', '12:34');
+
+INSERT INTO incidentReport(FID, CMReporting, CMInvolved, TypeOfIncident, Description)
+VALUES (10, 'FN173', 'FN174', 'Accident', 'Attendant spilled food tray over passenger.'),
+(1, 'FN120', 'FN130', 'Medical', 'Co-pilot is having a short of breath.'),
+(8, 'FN170', 'FN169', 'Medical', 'Attendant performed CPR on a passenger.');

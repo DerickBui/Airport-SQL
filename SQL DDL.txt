@@ -1,0 +1,165 @@
+CREATE TABLE airline (
+	airlineName varchar(50) NOT NULL,
+	HQLocation varchar(50) NOT NULL,
+	CONSTRAINT airline_pk PRIMARY KEY (airlineName)
+);
+
+CREATE TABLE plane (
+	airlineName varchar(50) NOT NULL,
+	FAATailNum varchar(50) NOT NULL,
+	NumOfSeats int NOT NULL,
+	PlaneName varchar(50),
+	ModelNum varchar(50) NOT NULL,
+	YearsOfServ int NOT NULL,
+	CONSTRAINT plane_pk PRIMARY KEY (airlineName, FAATailNum, NumOfSeats),
+	CONSTRAINT plane_fk FOREIGN KEY (airlineName) REFERENCES airline(airlineName),
+	CONSTRAINT plane_chk CHECK (YearsOfServ <= 30)
+);
+
+CREATE TABLE airport (
+	airportName varchar(50) NOT NULL,
+	location varchar(50) NOT NULL,
+	FAAAbriev varchar(50) NOT NULL,
+	CONSTRAINT airport_pk PRIMARY KEY (airportName)
+);
+
+CREATE TABLE schedule (
+	SID int NOT NULL,
+	FlightNum int NOT NULL,
+	departingAirport varchar(50) NOT NULL,
+	arrivingAirport varchar(50) NOT NULL,
+	departureTime time NOT NULL,
+	arrivalTime time NOT NULL,
+	CONSTRAINT schedule_pk PRIMARY KEY (SID),
+	CONSTRAINT schedule_fk1 FOREIGN KEY (departingAirport) REFERENCES airport(airportName),
+	CONSTRAINT schedule_fk2 FOREIGN KEY (arrivingAirport) REFERENCES airport(airportName),
+	CONSTRAINT schedule_chk CHECK (NOT departingAirport = arrivingAirport),
+	CONSTRAINT schedule_uk UNIQUE (FlightNum, departingAirport, arrivingAirport, departureTime, arrivalTime)
+);
+
+CREATE TABLE internationalFlight (
+	SID int NOT NULL,
+	InternationalTaxCR varchar(50) NOT NULL,
+	CONSTRAINT internationalflight_pk PRIMARY KEY (SID),
+	CONSTRAINT internationalflight_fk FOREIGN KEY (SID) REFERENCES schedule(SID)
+);
+
+CREATE TABLE chargedFlight (
+	SID int NOT NULL,
+	CONSTRAINT chargedflight_pk PRIMARY KEY (SID),
+	CONSTRAINT chargedflight_fk FOREIGN KEY (SID) REFERENCES schedule(SID)
+);
+
+CREATE TABLE amenity (
+	SID int NOT NULL,
+	type varchar(50) NOT NULL,
+	cost int NOT NULL,
+	CONSTRAINT amenity_pk PRIMARY KEY (SID, type, cost)
+);
+
+CREATE TABLE domesticFlight (
+	SID int NOT NULL,
+	domesticTaxCR varchar(50) NOT NULL,
+	CONSTRAINT domesticflight_pk PRIMARY KEY (SID),
+	CONSTRAINT domesticflight_fk FOREIGN KEY (SID) REFERENCES chargedFlight(SID)
+);
+
+CREATE TABLE localFlight (
+	SID int NOT NULL,
+	localTaxCR varchar(50) NOT NULL,
+	CONSTRAINT localflight_pk PRIMARY KEY (SID),
+	CONSTRAINT localflight_fk FOREIGN KEY (SID) REFERENCES chargedFlight(SID)
+);
+
+CREATE TABLE crew (
+	CID int NOT NULL,
+	crewName varchar(50) NOT NULL,
+	CONSTRAINT crew_pk PRIMARY KEY (CID),
+	CONSTRAINT crew_uk UNIQUE (CID, crewName)
+);
+
+CREATE TABLE crewMember (
+	CID int,
+	fName varchar(50) NOT NULL,
+	lName varchar(50) NOT NULL,
+	FAANum varchar(50) NOT NULL,
+	CONSTRAINT crewmember_pk PRIMARY KEY (FAANum),
+	CONSTRAINT crewmember_fk FOREIGN KEY (CID) REFERENCES crew(CID)
+);
+
+CREATE TABLE pilot (
+	FAANum varchar(50) NOT NULL,
+	pLicense varchar(50) NOT NULL,
+	CONSTRAINT pilot_pk PRIMARY KEY (FAANum),
+	CONSTRAINT pilot_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
+);
+
+CREATE TABLE copilot (
+	FAANum varchar(50) NOT NULL,
+	cpLicense varchar(50) NOT NULL,
+	CONSTRAINT copilot_pk PRIMARY KEY (FAANum),
+	CONSTRAINT copilot_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
+);
+
+CREATE TABLE navigator (
+	FAANum varchar(50) NOT NULL,
+	nLicense varchar(50) NOT NULL,
+	CONSTRAINT navigator_pk PRIMARY KEY (FAANum),
+	CONSTRAINT navigator_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
+);
+
+CREATE TABLE attendant (
+	FAANum varchar(50) NOT NULL,
+	aCertNum int NOT NULL,
+	CONSTRAINT attendant_pk PRIMARY KEY (FAANum),
+	CONSTRAINT attendant_fk FOREIGN KEY (FAANum) REFERENCES crewMember(FAANum)
+);
+
+CREATE TABLE flight (
+	FID int NOT NULL,
+	CID int NOT NULL,
+	SID int NOT NULL,
+	airlineName varchar(50) NOT NULL,
+	FAATailNum varchar(50) NOT NULL,
+	NumOfSeats int NOT NULL,
+	dates date NOT NULL,
+	numOfPassengers int NOT NULL,
+	aDepTime time NOT NULL,
+	aArrTime time NOT NULL,
+	CONSTRAINT flight_pk PRIMARY KEY (FID),
+	CONSTRAINT flight_fk1 FOREIGN KEY (CID) REFERENCES crew(CID),
+	CONSTRAINT flight_fk2 FOREIGN KEY (SID) REFERENCES schedule(SID),
+	CONSTRAINT flight_fk3 FOREIGN KEY (airlineName, FAATailNum, NumOfSeats) REFERENCES plane(airlineName, FAATailNum, NumOfSeats),
+	CONSTRAINT flight_uk UNIQUE (CID, SID, airlineName, FAATailNum, NumOfSeats, dates),
+	CONSTRAINT flight_chk CHECK (NumOfSeats >= numOfPassengers)
+);
+
+CREATE TABLE incidentReport (
+	FID int NOT NULL,
+	CMReporting varchar(50) NOT NULL,
+	CMInvolved varchar(50) NOT NULL,
+	TypeOfIncident varchar(50) NOT NULL,
+	Description varchar(50) NOT NULL,
+	CONSTRAINT incidentreport_pk PRIMARY KEY (FID, CMReporting, CMInvolved),
+	CONSTRAINT incidentreport_fk1 FOREIGN KEY (FID) REFERENCES flight(FID),
+	CONSTRAINT incidentreport_fk2 FOREIGN KEY (CMReporting) REFERENCES crewMember(FAANum),
+	CONSTRAINT incidentreport_fk3 FOREIGN KEY (CMInvolved) REFERENCES crewMember(FAANum)
+);
+
+drop table incidentReport
+drop table flight
+drop table attendant
+drop table navigator
+drop table copilot
+drop table pilot
+drop table crewmember
+drop table crew
+drop table localFlight
+drop table domesticFlight
+drop table amenity
+drop table chargedFlight
+drop table internationalFlight
+drop table schedule
+drop table airport
+drop table plane
+drop table airline
