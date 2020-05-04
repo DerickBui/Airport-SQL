@@ -3,52 +3,63 @@ SELECT a.AIRPORTNAME, f.AIRLINENAME FROM airport a NATURAL JOIN schedule s NATUR
 GROUP BY a.AIRPORTNAME, f.AIRLINENAME
 ORDER BY a.AIRPORTNAME;
 
---all departing airports per airline
-SELECT f.airlineName, s.departingAirport FROM schedule s INNER JOIN flight f
+--all flights sorted by departing airports
+SELECT f.AIRLINENAME, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, f.DATES FROM schedule s
+INNER JOIN flight f
 ON s.SID = f.SID
-ORDER BY f.airlineName;
+ORDER BY s.DEPARTINGAIRPORT;
 
---all arriving airports
-SELECT f.airlineName, s.arrivingAirport FROM schedule s INNER JOIN flight f
+--all flights sorted by arriving airports
+SELECT f.AIRLINENAME, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, f.DATES FROM schedule s
+INNER JOIN flight f
 ON s.SID = f.SID
-ORDER BY f.airlineName;
+ORDER BY s.ARRIVINGAIRPORT;
 
 --shortest flight
-select f.AIRLINENAME, MIN({fn timestampdiff(SQL_TSI_SECOND, f.ADEPTIME, f.AARRTIME)}) AS "Actual Seconds Difference" FROM flight f
-GROUP BY f.AIRLINENAME
-ORDER BY f.AIRLINENAME;
+SELECT f.AIRLINENAME, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, f.DATES,
+{fn timestampdiff(SQL_TSI_SECOND, f.ADEPTIME, f.AARRTIME)} AS "Seconds Difference" FROM schedule s
+INNER JOIN flight f
+ON s.SID = f.SID
+ORDER BY {fn timestampdiff(SQL_TSI_SECOND, f.ADEPTIME, f.AARRTIME)} ASC;
 
 --longest flight
-select f.AIRLINENAME, MAX({fn timestampdiff(SQL_TSI_SECOND, f.ADEPTIME, f.AARRTIME)}) AS "Actual Seconds Difference" FROM flight f
-GROUP BY f.AIRLINENAME
-ORDER BY f.AIRLINENAME;
+SELECT f.AIRLINENAME, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, f.DATES,
+{fn timestampdiff(SQL_TSI_SECOND, f.ADEPTIME, f.AARRTIME)} AS "Seconds Difference" FROM schedule s
+INNER JOIN flight f
+ON s.SID = f.SID
+ORDER BY {fn timestampdiff(SQL_TSI_SECOND, f.ADEPTIME, f.AARRTIME)} DESC;
 
 --flights with extras
-SELECT s.FLIGHTNUM, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, s.DEPARTURETIME, s.ARRIVALTIME, a."TYPE", a.COST
+SELECT f.AIRLINENAME, s.FLIGHTNUM, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, a."TYPE", a.COST
 FROM schedule s 
 INNER JOIN chargedFlight chg ON s.SID = chg.SID
-INNER JOIN amenity a ON chg.SID = a.SID;
+INNER JOIN amenity a ON chg.SID = a.SID
+INNER JOIN flight f ON s.SID = f.SID
+GROUP BY f.AIRLINENAME, s.FLIGHTNUM, s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT, a."TYPE", a.COST;
 
 --crew roster
 SELECT fl.AIRLINENAME, c.CREWNAME, cm.FNAME, cm.LNAME, cm.FAANUM FROM flight fl
 INNER JOIN crew c ON fl.CID = c.CID
 INNER JOIN crewmember cm ON c.CID = cm.CID
-ORDER BY fl.FAATAILNUM, c.CREWNAME, cm.FNAME ASC;
+GROUP BY fl.AIRLINENAME, c.CREWNAME, cm.FNAME, cm.LNAME, cm.FAANUM
+ORDER BY fl.AIRLINENAME, c.CREWNAME, cm.FNAME ASC;
 
 --available trips
 SELECT s.DEPARTINGAIRPORT, s.ARRIVINGAIRPORT FROM schedule s
 ORDER BY s.DEPARTINGAIRPORT;
 
 --count of arriving airport in city
-SELECT a.LOCATION, s.ARRIVINGAIRPORT AS "Arriving Airports" FROM airport a 
-LEFT OUTER JOIN schedule s ON a.AIRPORTNAME = s.ARRIVINGAIRPORT
-WHERE s.ARRIVINGAIRPORT IS NOT NULL
+SELECT a.LOCATION, f.AIRLINENAME, f.FAATAILNUM AS "Arriving Flights" FROM airport a 
+INNER JOIN schedule s ON a.AIRPORTNAME = s.ARRIVINGAIRPORT
+INNER JOIN flight f ON s.SID = f.SID
+GROUP BY a.LOCATION, f.AIRLINENAME, F.FAATAILNUM
 ORDER BY a.LOCATION;
 
 --count of departing airport in city
-SELECT a.LOCATION, s.DEPARTINGAIRPORT AS "Departing Airports" FROM airport a 
-LEFT OUTER JOIN schedule s ON a.AIRPORTNAME = s.DEPARTINGAIRPORT
-WHERE s.DEPARTINGAIRPORT IS NOT NULL
+SELECT a.LOCATION, f.AIRLINENAME, f.FAATAILNUM AS "Departing Flights" FROM airport a 
+INNER JOIN schedule s ON a.AIRPORTNAME = s.DEPARTINGAIRPORT
+INNER JOIN flight f ON s.SID = f.SID
+GROUP BY a.LOCATION, f.AIRLINENAME, F.FAATAILNUM
 ORDER BY a.LOCATION;
 
 --airlines in service category
@@ -63,8 +74,9 @@ GROUP BY c.CREWNAME
 HAVING COUNT(f.dates) > 1;
 
 --all incident reports
-SELECT * FROM incidentReport
-ORDER BY FID;
+SELECT f.FAATAILNUM, ir.CMREPORTING, ir.CMINVOLVED, ir.TYPEOFINCIDENT, ir.DESCRIPTION FROM incidentReport ir
+INNER JOIN flight f ON ir.FID = f.FID
+ORDER BY f.FAATAILNUM;
 
 --within 3 days
 select f.FAATAILNUM, f.DATES, {fn timestampdiff(SQL_TSI_DAY, current_date, f.DATES)} AS "Actual Day Difference" 
@@ -72,19 +84,21 @@ FROM flight f
 WHERE {fn timestampdiff(SQL_TSI_DAY, current_date, f.DATES)} <= 3
 AND {fn timestampdiff(SQL_TSI_DAY, current_date, f.DATES)} >= 0;
 
---in a week of busiest airport
-SELECT a.LOCATION, COUNT(s.ARRIVINGAIRPORT) AS "Number of Flights"
+--in a week
+SELECT a.LOCATION, f.FAATAILNUM
 FROM airport a
 INNER JOIN schedule s ON a.AIRPORTNAME = s.ARRIVINGAIRPORT
 INNER JOIN flight f ON s.SID = f.SID
 WHERE {fn timestampdiff(SQL_TSI_DAY, current_date, f.DATES)} < 7
 AND {fn timestampdiff(SQL_TSI_DAY, current_date, f.DATES)} > -7
-GROUP BY a.LOCATION;
+GROUP BY a.LOCATION, f.FAATAILNUM;
+
 
 --30 min late
-SELECT f.FAATAILNUM,{fn timestampdiff(SQL_TSI_MINUTE, f.ADEPTIME, s.DEPARTURETIME)} AS "Actual Minute Difference"
-FROM flight f NATURAL JOIN schedule s
+SELECT f.FAATAILNUM, s.DEPARTURETIME, f.ADEPTIME, s.ARRIVALTIME, f.AARRTIME, {fn timestampdiff(SQL_TSI_MINUTE, f.ADEPTIME, s.DEPARTURETIME)} AS "Minute Difference"
+FROM flight f INNER JOIN schedule s ON f.SID = s.SID
 WHERE {fn timestampdiff(SQL_TSI_MINUTE, f.ADEPTIME, s.DEPARTURETIME)} > 30;
+
 
 --individually assigned 1, all the planes the company owns
 SELECT p.AIRLINENAME, p.PLANENAME, p.FAATAILNUM, p.YEARSOFSERV FROM plane p
