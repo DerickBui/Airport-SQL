@@ -89,7 +89,7 @@ SELECT a.LOCATION, f.FAATAILNUM
 FROM airport a
 INNER JOIN schedule s ON a.AIRPORTNAME = s.ARRIVINGAIRPORT
 INNER JOIN flight f ON s.SID = f.SID
-WHERE {fn timestampdiff(SQL_TSI_DAY, current_date, f.DATES)} < 7
+WHERE {fn timestampdiff(SQL_TSI_DAY, DATE('05/04/'), f.DATES)} <= 0
 AND {fn timestampdiff(SQL_TSI_DAY, current_date, f.DATES)} > -7
 GROUP BY a.LOCATION, f.FAATAILNUM;
 
