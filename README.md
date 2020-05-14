@@ -3,3 +3,4 @@ This repository comprises of:
   - UML Diagrams
   - Relation Schemes
   - Class Associations and Definitions
+  - (More in progress)
